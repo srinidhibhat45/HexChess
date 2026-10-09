@@ -1,6 +1,6 @@
 # Deploy HexChess to Vercel
 
-Target: **https://hexchess.srinidhibhat.com/**. This repository is prepared for deployment; adding the Vercel project and DNS record is a separate step.
+Live URL: **https://hexchess.srinidhibhat.com/**. Verified on 9 October 2026: HTTPS returned successfully from Vercel and served the same application bundle as the checked main build. The instructions below document the setup for future deployments.
 
 ## Import the repository
 
