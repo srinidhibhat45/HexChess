@@ -1,6 +1,7 @@
 import { legalMoves, opposite, outcome, replay } from './engine'
 import type { Move } from './engine'
 import { clockValues } from './session'
+import { playerColor, premoveTargets, validatedPremove } from './premoves'
 import type { Session } from './session'
 
 export const canUseHints = (s: Session) => s.settings.mode === 'computer'
@@ -29,7 +30,7 @@ export function playMove(s: Session, move: Move, now = Date.now(), computer = fa
   clocks[pos.turn] += s.settings.increment * 1000
   // Explicitly leaving zen mode is respected, including before the opening move.
   const zen = s.zen ?? true
-  return {...s, moves: [...s.moves, valid], clocks, clockHistory: [...s.clockHistory, before], started: true, anchor: now, zen, drawOffer: null}
+  return {...s, moves: [...s.moves, valid], clocks, clockHistory: [...s.clockHistory, before], started: true, anchor: now, zen, drawOffer: null, premove:computer?s.premove:undefined}
 }
 export function offerDraw(s: Session): Session {
   const {pos, keys} = replay(s.moves)
@@ -42,4 +43,20 @@ export function offerDraw(s: Session): Session {
 
 export function declineDraw(s:Session):Session {
   return s.settings.mode==='correspondence'&&!s.result&&s.drawOffer&&s.drawOffer!==s.seat?{...s,drawOffer:null}:s
+}
+
+export function queuePremove(s:Session,move:Move):Session {
+  const color=playerColor(s),{pos,keys}=replay(s.moves)
+  if(!color||pos.turn===color||s.result||outcome(pos,keys)||s.paused)return s
+  if(!premoveTargets(pos,move.from,color).some(m=>m.to===move.to&&m.promotion===move.promotion))return s
+  return {...s,premove:{move,after:s.moves.length,gameId:s.id}}
+}
+export function resolvePremove(s:Session,now=Date.now()):Session {
+  if(!s.premove)return s
+  const p=validatedPremove(s.premove,s),{pos,keys}=replay(s.moves),color=playerColor(s)
+  if(!p||s.result||outcome(pos,keys)||s.paused)return {...s,premove:undefined}
+  if(s.moves.length===p.after&&pos.turn!==color)return s
+  const cleared={...s,premove:undefined}
+  if(s.moves.length!==p.after+1||pos.turn!==color)return cleared
+  return playMove(cleared,p.move,now)
 }

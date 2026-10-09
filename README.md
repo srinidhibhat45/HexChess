@@ -20,7 +20,7 @@ The service worker is enabled in production only. A successful first visit cache
 
 ## Included
 
-- An original responsive SVG board with 91 cells and custom ivory / forest-green pieces.
+- An original responsive SVG board with 91 cells and sharp black / ivory pieces and a soft grayscale Classic board by default. Garden, Slate, and Walnut remain available.
 - Complete Gliński movement rules, king safety, check, checkmate, en passant, four promotion choices, and the pawn double-step option from any friendly pawn starting cell.
 - Original ¾–¼ stalemate scoring. Automatic draws at three repetitions, 100 half-moves without a capture or pawn move, and conservatively recognized insufficient material. Remaining unusual dead positions can be drawn by agreement.
 - Computer opponents with three practical difficulty settings using time-bounded iterative-deepening alpha-beta search in a Web Worker. These levels are not Elo ratings and are not presented as tournament-strength play.
@@ -29,7 +29,9 @@ The service worker is enabled in production only. A successful first visit cache
 - Zen mode automatically activates when a game starts. Exit zen, Z, or Esc restores the playing room; your choice persists.
 - Configurable clocks from 0–180 minutes, increment from 0–120 seconds, presets, pause / resume in computer practice, and wall-time accounting through background tabs and reloads. Clock begins after White’s opening move. Timeout is a loss, except against a bare king when the app records a draw.
 - Takebacks and hints in computer practice. Human games remove assistance and pause controls. Flip board, move review, resignation, and draw agreements remain available; correspondence draws use an offer and returned acceptance.
-- Device-local autosave, game export / import, three board palettes, coordinates, dark mode, optional sound, and reduced-motion support.
+- Right-drag arrows, right-click cell circles, four annotation colors, repeat-to-remove, and a two-tap Draw tool for touch and keyboard users. Annotations clear on a move or ordinary left-click; Esc or Clear arrows removes them.
+- Optional single premoves for computer and correspondence games: select your piece and destination during the opponent’s turn. Blue cells mark the pending move; cancel it with the visible control or Esc. Legal moves and clock rules are rechecked after the reply, including captures, pins, promotion, and game end. Premoves persist only on the device and are excluded from shared links.
+- Device-local autosave, game export / import, four board palettes, coordinates, dark mode, optional sound, and reduced-motion support.
 - Six interactive piece lessons, extensive original rules and strategy guidance, an embedded version of the user-supplied video, and further reading.
 - Keyboard navigation: focus the board with Tab, move focus using arrow keys, and select / move with Enter or Space. Pointer users can tap, click, or drag pieces.
 - Self-hosted OFL fonts, offline precaching, application icons, maskable icon, and install instructions for iOS, Android, and desktop.
@@ -51,7 +53,7 @@ npm test
 npm run build
 ```
 
-The engine, session, fair-play, and offline-cache suites checks geometry, starting armies, bishop colors, all tutorial destinations, king safety and pins, checkmate, stalemate, pawn movement, retained double steps, en passant and discovered check, underpromotion, draws, history validation, AI legality, clock accounting, Unicode game links, corrupted-storage recovery, offline navigation fallback, Origin-varying cached modules, and cache updates, automatic zen mode, retained focus preferences, restricted assistance, assigned player colors, conflicting link rejection, draw handshakes, fabricated results, and clock bounds. Desktop and phone layouts, tutorial completion, AI replies, custom clocks, undo, shared-link round trips, reload persistence, and offline play were also checked through the browser.
+The engine, session, fair-play, and offline-cache suites checks geometry, starting armies, bishop colors, all tutorial destinations, king safety and pins, checkmate, stalemate, pawn movement, retained double steps, en passant and discovered check, underpromotion, draws, history validation, AI legality, clock accounting, Unicode game links, corrupted-storage recovery, offline navigation fallback, Origin-varying cached modules, and cache updates, automatic zen mode, retained focus preferences, restricted assistance, assigned player colors, conflicting link rejection, draw handshakes, fabricated results, and clock bounds, premove execution, clock accounting, captures, blocked destinations, stale queues, privacy, promotion choices, and correspondence replies. Desktop and phone layouts, tutorial completion, AI replies, custom clocks, undo, shared-link round trips, reload persistence, and offline play were also checked through the browser.
 
 ## Rules and references
 

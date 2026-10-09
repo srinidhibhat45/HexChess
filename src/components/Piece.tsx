@@ -11,13 +11,13 @@ const paths: Record<PieceType,string[]> = {
 export function Piece({type,color,size=44}: {type:PieceType;color:Color;size?:number}) {
   const id=useId().replaceAll(':',''),white=color==='white'
   return <svg width={size} height={size} viewBox="0 0 44 48" className={`piece piece-${color}`} aria-hidden="true">
-    <defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={white?'#fffef8':'#4b6558'}/><stop offset=".45" stopColor={white?'#f5ecd9':'#253c32'}/><stop offset="1" stopColor={white?'#d4c5a7':'#13291f'}/></linearGradient></defs>
-    <g fill={`url(#${id})`} stroke={white?'#8d8068':'#11291f'} strokeWidth="1.45" strokeLinejoin="round" strokeLinecap="round">
-      {paths[type].map((d,i)=><path d={d} key={i} fill={(type==='K'&&i===0)||(type==='B'&&i===2)||(type==='N'&&i===1)?'none':undefined}/>)}
+    <defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={white?'#fffefb':'#34373c'}/><stop offset=".45" stopColor={white?'#f5f4ef':'#202226'}/><stop offset="1" stopColor={white?'#e3e1d9':'#141619'}/></linearGradient></defs>
+    <g fill={`url(#${id})`} stroke={white?'#45474a':'#08090b'} strokeWidth="1.65" strokeLinejoin="round" strokeLinecap="round">
+      {paths[type].map((d,i)=><path d={d} key={i} stroke={((type==='B'&&i===2)||(type==='N'&&i===1))?(white?'#45474a':'#a2a5a8'):undefined} fill={(type==='K'&&i===0)||(type==='B'&&i===2)||(type==='N'&&i===1)?'none':undefined}/>)}
       {type==='Q'&&<><circle cx="10.5" cy="12" r="2.5"/><circle cx="22" cy="9" r="2.5"/><circle cx="33.5" cy="12" r="2.5"/></>}
-      {type==='N'&&<circle cx="23" cy="15" r="1.3" fill={white?'#71654e':'#bdc9b9'} stroke="none"/>}
+      {type==='N'&&<circle cx="23" cy="15" r="1.3" fill={white?'#34373b':'#d7d8d9'} stroke="none"/>}
       <path d="M13 40 H31 L33 44 H11 Z"/>
-      <path d="M15 42 H29" stroke={white?'#fffef8':'#637567'} strokeWidth=".9"/>
+      <path d="M15 42 H29" stroke={white?'#fffefb':'#a2a5a8'} strokeWidth=".9"/>
     </g>
   </svg>
 }

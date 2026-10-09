@@ -1,10 +1,12 @@
 import { CELL_MAP, opposite, outcome, replay } from './engine'
 import type { Color, Move, Outcome } from './engine'
+import { validatedPremove } from './premoves'
+import type { Premove } from './premoves'
 import type { Difficulty } from './ai'
 export type Mode = 'computer' | 'local' | 'correspondence'
 export type Settings = { mode:Mode; side:Color; difficulty:Difficulty; minutes:number; increment:number; whiteName:string; blackName:string }
 export type Clocks = Record<Color,number>
-export type Session = { settings:Settings; moves:Move[]; clocks:Clocks; clockHistory:Clocks[]; anchor:number; started:boolean; paused:boolean; result:Outcome|null; id:string; zen?:boolean; seat?:Color; drawOffer?:Color|null }
+export type Session = { settings:Settings; moves:Move[]; clocks:Clocks; clockHistory:Clocks[]; anchor:number; started:boolean; paused:boolean; result:Outcome|null; id:string; zen?:boolean; seat?:Color; drawOffer?:Color|null; premove?:Premove }
 export const DEFAULT_SETTINGS: Settings = {mode:'computer',side:'white',difficulty:'club',minutes:10,increment:5,whiteName:'You',blackName:'Computer'}
 export const STORAGE_KEY='hexchess.game.v1'
 const sessionId=()=>globalThis.crypto?.randomUUID?.()||`game-${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -93,7 +95,7 @@ export function importLink(hash:string, trusted?:Session):Session {
   const drawOffer=validateDrawOffer(data.drawOffer)
   if(drawOffer&&data.sender&&drawOffer!==data.sender)throw new Error('The draw offer belongs to a different color.')
   if(drawOffer&&drawOffer!==replay(moves).pos.turn)throw new Error('Only the player to move can offer a draw.')
-  return {...fresh,id,moves,started:moves.length>0,clockHistory:moves.map(()=>({white:0,black:0})),result,zen:true,seat,drawOffer}
+  return {...fresh,id,moves,started:moves.length>0,clockHistory:moves.map(()=>({white:0,black:0})),result,zen:true,seat,drawOffer,premove:trusted&&trusted.id===id?validatedPremove(trusted.premove,{...fresh,id,moves,seat}):undefined}
 
 }
 export function restore(skipLink=false):{session:Session;error?:string;imported?:boolean} {
@@ -110,7 +112,9 @@ export function restore(skipLink=false):{session:Session;error?:string;imported?
       const limit=settings.minutes*60000+moves.length*settings.increment*1000
       const validClocks=(c:Clocks)=>c&&Number.isFinite(c.white)&&Number.isFinite(c.black)&&c.white>=0&&c.black>=0&&c.white<=limit&&c.black<=limit
       if(!validClocks(s.clocks)||!Number.isFinite(s.anchor)||s.anchor>Date.now()+1000||!Array.isArray(s.clockHistory)||s.clockHistory.length!==moves.length||!s.clockHistory.every(validClocks)) throw new Error('Invalid saved clock.')
-      return {session:{...s,settings,moves,result:validateOutcome(s.result,moves,settings,s.clocks),drawOffer:validateDrawOffer(s.drawOffer),zen:typeof s.zen==='boolean'?s.zen:undefined,seat:settings.mode==='correspondence'?s.seat==='white'||s.seat==='black'?s.seat:replay(moves).pos.turn:undefined,started:!!s.started||moves.length>0,paused:settings.mode==='computer'&&!!s.paused,id:typeof s.id==='string'&&/^[A-Za-z0-9-]{1,100}$/.test(s.id)?s.id:sessionId()}}
+      const saved:Session={...s,settings,moves,result:validateOutcome(s.result,moves,settings,s.clocks),drawOffer:validateDrawOffer(s.drawOffer),zen:typeof s.zen==='boolean'?s.zen:undefined,seat:settings.mode==='correspondence'?s.seat==='white'||s.seat==='black'?s.seat:replay(moves).pos.turn:undefined,started:!!s.started||moves.length>0,paused:settings.mode==='computer'&&!!s.paused,id:typeof s.id==='string'&&/^[A-Za-z0-9-]{1,100}$/.test(s.id)?s.id:sessionId()}
+      saved.premove=saved.result?undefined:validatedPremove(s.premove,saved)
+      return {session:saved}
     }
   } catch {return {session:newSession(),error:location.hash.startsWith('#game=')?'This game link could not be opened. A fresh board is ready.':'Your saved game could not be restored. A fresh board is ready.'}}
   return {session:newSession()}
